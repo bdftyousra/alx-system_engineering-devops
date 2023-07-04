@@ -1,11 +1,13 @@
 #!/usr/bin/env ruby
-
 regex = /School/
 
 input = ARGV[0]
 
-match = input.match(regex)
+matches = input.scan(regex)
 
-if match
-  puts match[0]
+if matches.any?
+  puts matches.join
+else
+  puts ""
 end
+
