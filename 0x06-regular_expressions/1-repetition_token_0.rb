@@ -1,2 +1,13 @@
 #!/usr/bin/env ruby
-puts ARGV[0].scan(/hbt{2,5}n/).join
+
+regex = /hbt{2,5}n/
+
+input = ARGV[0]
+
+match = input.match(regex)
+
+if match
+  puts match[0]
+else
+  puts ""
+end
