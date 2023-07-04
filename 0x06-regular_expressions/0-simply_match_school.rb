@@ -1,2 +1,9 @@
 #!/usr/bin/env ruby
-puts ARGV[0].scan(/Holberton/).join
+
+regex = /School/
+
+input = ARGV[0]
+
+if input.match(regex)
+  puts input
+end
