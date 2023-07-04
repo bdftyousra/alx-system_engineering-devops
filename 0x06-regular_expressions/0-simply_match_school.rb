@@ -4,6 +4,8 @@ regex = /School/
 
 input = ARGV[0]
 
-if input.match(regex)
-  puts input
+match = input.match(regex)
+
+if match
+  puts match[0]
 end
