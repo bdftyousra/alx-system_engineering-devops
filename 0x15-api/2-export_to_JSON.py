@@ -1,29 +1,23 @@
 #!/usr/bin/python3
-"""
-Task 2 - extend your Python script to export data in the JSON format.
-"""
+'''
+A script to export data in the JSON format.
+'''
+
+import json
+import requests
+from sys import argv
 
 if __name__ == '__main__':
-    import requests
-    import json
-    from sys import argv
-
-    rq = requests.get('https://jsonplaceholder.typicode.com/users/{}'.
-                      format(argv[1]))
-    rqname = rq.json().get('username')
-
-    rq = requests.get('https://jsonplaceholder.typicode.com/todos?userId={}'.
-                      format(argv[1]))
-    rqdata = rq.json()
-
-    export = {}
-    export['{}'.format(argv[1])] = []
-    for task in rqdata:
-        export['{}'.format(argv[1])].append({
-            'task': task.get('title'),
-            'completed': task.get('completed'),
-            'username': rqname
-        })
-
-    with open('{}.json'.format(argv[1]), 'w') as outfile:
-        json.dump(export, outfile)
+    uid = argv[1]
+    url = "https://jsonplaceholder.typicode.com/users/{}".format(uid)
+    user = requests.get(url, verify=False).json()
+    url = "https://jsonplaceholder.typicode.com/todos?userId={}".format(uid)
+    todo = requests.get(url, verify=False).json()
+    name = user.get('username')
+    t = [{"task": t.get("title"),
+          "username": name,
+          "completed": t.get("completed")} for t in todo]
+    bj = {}
+    bj[uid] = t
+    with open("{}.json".format(uid), 'w') as filejs:
+        json.dump(bj, filejs)
