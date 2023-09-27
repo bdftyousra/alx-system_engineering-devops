@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+<<<<<<< HEAD
 # connect to using 172.17.0.12 server the private key ~/.ssh/school with the user ubuntu.
 
 ssh -i ~/.ssh/school ubuntu@172.17.0.12
+=======
+# connect to using 172.17.0.18 server the private key ~/.ssh/school with the user ubuntu.
+
+ssh -i ~/.ssh/school ubuntu@172.17.0.18
+>>>>>>> cfe7a538bb49c0061ea657b53994203510371c89
