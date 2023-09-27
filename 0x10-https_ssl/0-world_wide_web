@@ -1,15 +1,29 @@
 #!/usr/bin/env bash
-# Comment
-prints () {
-    dig "$1" | grep -A1 'ANSWER SECTION:' | sed -r "s/$1./$2/g" | awk -F" " 'NR==2 { print "The subdomain " $1 " is a " $4 " record and points to " $5 }'
-}
-if [ $# -eq 1 ];
-then
-    prints "www.$1" "www"
-    prints "lb-01.$1" "lb-01"
-    prints "web-01.$1" "web-01"
-    prints "web-02.$1" "web-02"
-elif [ $# -eq 2 ];
-then
-     prints "$2.$1" "$2"
+# A Bash script that will display information about the subdomains
+
+# Check if at least one argument is provided
+if [ $# -lt 1 ]; then
+  echo "Usage: $0 domain [subdomain1 subdomain2 ...]"
+  exit 1
 fi
+
+# Set domain name
+domain="$1"
+
+# Set subdomains to query
+subdomains=("www" "lb-01" "web-01" "web-02")
+
+# If additional subdomains are provided as arguments, add them to the subdomains array
+if [ $# -gt 1 ]; then
+  subdomains+=("${@:2}")
+fi
+
+# Loop through subdomains and display information
+for subdomain in "${subdomains[@]}"; do
+  output=$(dig "$subdomain.$domain" +short)
+  if [ -n "$output" ]; then
+    echo "The subdomain $subdomain has IP address $output"
+  else
+    echo "The subdomain $subdomain does not exist"
+  fi
+done
