@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+sudo apt update
+pip3 install gunicorn
+sudo ufw allow 5000

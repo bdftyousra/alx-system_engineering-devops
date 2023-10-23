@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+sudo apt update
+git clone https://www.github.com/3akare/AirBnB_clone_v2.git
+sudo apt install python3-pip
+pip3 install Flask
+//install tmux to use dual screens
+sudo apt install tmux 
