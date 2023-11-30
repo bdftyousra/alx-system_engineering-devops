@@ -1,72 +1,48 @@
 #!/usr/bin/python3
 """
-Function that queries the Reddit API and prints
-the top ten hot posts of a subreddit
+Defines a function that queries Reddit API
 """
-import re
 import requests
-import sys
 
 
-def add_title(dictionary, hot_posts):
-    """ Adds item into a list """
-    if len(hot_posts) == 0:
-        return
-
-    title = hot_posts[0]['data']['title'].split()
-    for word in title:
-        for key in dictionary.keys():
-            c = re.compile("^{}$".format(key), re.I)
-            if c.findall(word):
-                dictionary[key] += 1
-    hot_posts.pop(0)
-    add_title(dictionary, hot_posts)
-
-
-def recurse(subreddit, dictionary, after=None):
-    """ Queries to Reddit API """
-    u_agent = 'Mozilla/5.0'
-    headers = {
-        'User-Agent': u_agent
-    }
-
-    params = {
-        'after': after
-    }
-
-    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
-    res = requests.get(url,
-                       headers=headers,
-                       params=params,
-                       allow_redirects=False)
-
-    if res.status_code != 200:
-        return None
-
-    dic = res.json()
-    hot_posts = dic['data']['children']
-    add_title(dictionary, hot_posts)
-    after = dic['data']['after']
-    if not after:
-        return
-    recurse(subreddit, dictionary, after=after)
-
-
-def count_words(subreddit, word_list):
-    """ Init function """
-    dictionary = {}
-
-    for word in word_list:
-        dictionary[word] = 0
-
-    recurse(subreddit, dictionary)
-
-    l = sorted(dictionary.items(), key=lambda kv: kv[1])
-    l.reverse()
-
-    if len(l) != 0:
-        for item in l:
-            if item[1] is not 0:
-                print("{}: {}".format(item[0], item[1]))
-    else:
-        print("")
+def count_words(subreddit, word_list, after=None, sort=True):
+    """
+    Queries the Reddit API, parses the title of all hot articles,
+    and prints a sorted count of given keywords (case-insensitive, delimited
+    by spaces. Javascript should count as javascript, but java should not)
+    Ags:
+        subreddit (str): name of subreddit
+        word_list (list): keywords to look out for
+        after (str): identifier of the last item on a listing
+        worddict (dict): results to be returned
+        ctr (int): condition to convert word_list to worddict
+    Returns:
+        worddict (dict) || None if subreddit is invalid
+    """
+    url = 'https://www.reddit.com/r/{}/hot.json'.format(subreddit)
+    params = {'after': after, 'limit': 100}
+    headers = {'User-Agent': 'advanced-api/0.0.1 by Mendy'}
+    req = requests.get(url=url,
+                       params=params, headers=headers, allow_redirects=False)
+    if req.status_code == 200:
+        response = req.json()
+        titles = [child['data']['title']
+                  for child in response['data']['children']]
+        after = response['data']['after']
+        if after is not None:
+            titles += count_words(subreddit,
+                                  word_list, after=after, sort=False)
+        if sort is True:
+            count = {k.lower(): 0 for k in word_list}
+            for title in titles:
+                count = {k: v + title.lower().split().count(k)
+                         for k, v in count.items()}
+            count = {k: v for k, v in count.items() if v > 0}
+            if len(count):
+                word_list = [w.lower() for w in word_list]
+                count = {k: v * word_list.count(k)
+                         for k, v in count.items()}
+                count = sorted(count.items(), key=lambda kv: (-kv[1], kv[0]))
+                [print("{}: {}".format(k, v)) for k, v in count]
+        else:
+            return titles
